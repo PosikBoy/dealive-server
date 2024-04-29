@@ -18,10 +18,9 @@ class AuthController {
           .json({ message: "Пользователь с такой почтой уже существует" });
       }
       const tokens = tokenService.generateTokens(user.id);
-      const today = new Date();
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
-        expires: new Date(today.setDate(today.getDate() + 30)),
+        maxAge: 1000 * 60 * 60 * 24 * 30,
       });
       return res.status(201).json({
         user,
@@ -47,6 +46,7 @@ class AuthController {
       const tokens = tokenService.generateTokens(user.id);
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 30,
       });
 
       return res.status(201).json({
@@ -59,12 +59,12 @@ class AuthController {
   }
   async refresh(req: Request, res: Response) {
     const { refreshToken } = req.cookies;
-
     try {
       const userData = await authService.refresh(refreshToken);
       res.cookie("refreshToken", userData.refreshToken, {
         httpOnly: true,
       });
+
       return res.status(201).json({
         user: userData.user,
         accessToken: userData.accessToken,
