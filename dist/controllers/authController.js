@@ -33,7 +33,7 @@ class AuthController {
                 const today = new Date();
                 res.cookie("refreshToken", tokens.refreshToken, {
                     httpOnly: true,
-                    expires: new Date(today.setDate(today.getDate() + 30)),
+                    maxAge: 1000 * 60 * 60 * 24 * 30,
                 });
                 return res.status(201).json({
                     user,
@@ -62,6 +62,7 @@ class AuthController {
                 const tokens = tokenService_1.default.generateTokens(user.id);
                 res.cookie("refreshToken", tokens.refreshToken, {
                     httpOnly: true,
+                    maxAge: 1000 * 60 * 60 * 24 * 30,
                 });
                 return res.status(201).json({
                     user,
