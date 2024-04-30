@@ -18,11 +18,11 @@ class ProfileController {
 
   async updateProfileInfo(req: Request, res: Response) {
     const { name, email, phoneNumber } = req.body;
-    console.log(name, email, phoneNumber);
     const bearerHeader = req.headers.authorization;
     if (!bearerHeader) {
       return res.status(401).json({ message: "Auth required" });
     }
+
     try {
       const [, token] = bearerHeader.split(" ");
       const profile = await profileService.updateProfileInfo(
@@ -31,9 +31,11 @@ class ProfileController {
         email,
         phoneNumber
       );
+
       return res.status(201).json({ ...profile });
-    } catch (error) {
-      res.status(400).json({ message: "Error occured" });
+    } catch (error: any) {
+      console.log(error);
+      res.status(400).json({ message: error.message });
     }
   }
 }

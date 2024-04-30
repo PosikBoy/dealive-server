@@ -50,16 +50,16 @@ class OrderModel {
                 const addOrderDataQuery = "INSERT INTO orders_data (client_id, phone, phone_name, parcel_type, weight, info, price) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 const [result] = yield db_1.default.execute(addOrderDataQuery, [
                     userId,
-                    orderData.phone,
-                    orderData.phoneName,
+                    orderData.phone || null,
+                    orderData.phoneName || null,
                     orderData.parcelType,
                     orderData.weight,
-                    orderData.info,
+                    orderData.info || null,
                     orderData.price,
                 ]);
                 const orderId = result.insertId;
                 addresses.forEach((address) => __awaiter(this, void 0, void 0, function* () {
-                    const addAddressQuery = "INSERT INTO order_addresses (order_id, city, street, house_number, floor, apartment, phone, phone_name, info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    const addAddressQuery = "INSERT INTO order_addresses (order_id, address, floor, apartment, phone, phone_name, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
                     const [result] = yield db_1.default.execute(addAddressQuery, [
                         orderId,
                         address.address || null,
@@ -73,6 +73,7 @@ class OrderModel {
                 return orderId;
             }
             catch (error) {
+                console.log(error);
                 throw new Error("Error occurred while sending order to the database");
             }
         });

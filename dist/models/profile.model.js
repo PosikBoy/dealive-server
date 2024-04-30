@@ -32,15 +32,15 @@ class ProfileModel {
                 };
                 return profile;
             }
-            catch (_a) {
+            catch (error) {
                 throw new Error("Error occurred while fetching profile by id from the database");
             }
         });
     }
     getProfileByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
+            const getProfileByEmailQuery = "SELECT id, name, email, phone_number FROM clients WHERE email = ?";
             try {
-                const getProfileByEmailQuery = "SELECT id, name, email, phone_number FROM clients WHERE email = ?";
                 const [result] = yield db_1.default.execute(getProfileByEmailQuery, [email]);
                 if (result.length === 0) {
                     return null;
@@ -61,9 +61,34 @@ class ProfileModel {
     }
     updateProfileInfo(userId, name, email, phoneNumber) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
+            const findUserByPhoneNumberQuery = "SELECT * FROM clients WHERE phone_number = ?";
+            try {
+                const [result] = yield db_1.default.execute(findUserByPhoneNumberQuery, [phoneNumber]);
+                if (((_a = result[0]) === null || _a === void 0 ? void 0 : _a.id) !== userId && result.length > 0) {
+                    throw new Error("Пользователь с таким номером уже существует");
+                }
+            }
+            catch (error) {
+                console.log(error);
+                throw error;
+            }
+            const findUserByEmailQuery = "SELECT * FROM clients WHERE email = ?";
+            try {
+                const [result] = yield db_1.default.execute(findUserByEmailQuery, [
+                    email,
+                ]);
+                if (((_b = result[0]) === null || _b === void 0 ? void 0 : _b.id) !== userId && result.length > 0) {
+                    throw new Error("Пользователь с таким email уже существует");
+                }
+            }
+            catch (error) {
+                console.log(error);
+                throw error;
+            }
             const updateProfileInfoQuery = "UPDATE clients SET name = ?, email = ?, phone_number = ? WHERE id = ?";
             try {
-                const [result] = yield db_1.default.query(updateProfileInfoQuery, [
+                yield db_1.default.execute(updateProfileInfoQuery, [
                     name,
                     email,
                     phoneNumber,
@@ -77,8 +102,8 @@ class ProfileModel {
                 };
                 return profile;
             }
-            catch (_a) {
-                throw new Error("Error occurred while fetching updating profile by id from the database");
+            catch (error) {
+                throw error;
             }
         });
     }

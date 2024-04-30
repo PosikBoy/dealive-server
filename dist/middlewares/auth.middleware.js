@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tokenService_1 = __importDefault(require("../services/tokenService"));
 class AuthMiddleware {
     authCheck(req, res, next) {
-        const authHeader = req.headers.authorization;
-        if (!authHeader) {
+        const bearerHeader = req.headers.authorization;
+        if (!bearerHeader) {
             return res.status(401).json({ message: "Auth required" });
         }
-        const accessToken = authHeader.split(" ")[1];
+        const accessToken = bearerHeader.split(" ")[1];
         if (!accessToken) {
             return res.status(401).json({ message: "Auth required" });
         }

@@ -20,17 +20,10 @@ class OrderConroller {
     }
   }
   async sendOrder(req: Request, res: Response) {
-    const bearerHeader = req.headers.authorization;
-    let clientId = 0;
-    if (bearerHeader) {
-      const [, token] = bearerHeader.split(" ");
-      const { userId } = tokenService.validateAccessToken(token);
-      clientId = userId;
-    }
-    const { orderData, addresses } = req.body;
+    const { userId, orderData, addresses } = req.body;
     try {
       const orderId = await orderService.sendOrder(
-        clientId,
+        userId,
         orderData,
         addresses
       );

@@ -34,16 +34,9 @@ class OrderConroller {
     }
     sendOrder(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const bearerHeader = req.headers.authorization;
-            let clientId = 0;
-            if (bearerHeader) {
-                const [, token] = bearerHeader.split(" ");
-                const { userId } = tokenService_1.default.validateAccessToken(token);
-                clientId = userId;
-            }
-            const { orderData, addresses } = req.body;
+            const { userId, orderData, addresses } = req.body;
             try {
-                const orderId = yield orderService_1.default.sendOrder(clientId, orderData, addresses);
+                const orderId = yield orderService_1.default.sendOrder(userId, orderData, addresses);
                 res.status(200).json({ orderId });
             }
             catch (error) {

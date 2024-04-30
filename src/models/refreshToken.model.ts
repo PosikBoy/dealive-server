@@ -55,14 +55,12 @@ class TokenModel {
   }
   async removeRefreshToken(refreshToken: string) {
     try {
-      console.log(refreshToken);
       const removeRefreshTokenQuery =
         "DELETE FROM refresh_tokens WHERE refresh_token = ?";
       await db.execute(removeRefreshTokenQuery, [refreshToken]);
       return refreshToken;
     } catch (error) {
       console.log(error);
-      throw new Error("Error occurred while removing the refresh token");
     }
   }
 }

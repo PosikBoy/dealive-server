@@ -2,6 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
 
 import { IProfile } from "../types/profile.interface";
+import { error } from "console";
 
 class ProfileModel {
   async getProfileById(userId: number): Promise<IProfile> {
@@ -23,7 +24,7 @@ class ProfileModel {
         phoneNumber: result[0].phone_number,
       };
       return profile;
-    } catch {
+    } catch (error) {
       throw new Error(
         "Error occurred while fetching profile by id from the database"
       );
@@ -31,9 +32,9 @@ class ProfileModel {
   }
 
   async getProfileByEmail(email: string): Promise<IProfile | null> {
+    const getProfileByEmailQuery =
+      "SELECT id, name, email, phone_number FROM clients WHERE email = ?";
     try {
-      const getProfileByEmailQuery =
-        "SELECT id, name, email, phone_number FROM clients WHERE email = ?";
       const [result] = await db.execute<RowDataPacket[]>(
         getProfileByEmailQuery,
         [email]
@@ -61,10 +62,41 @@ class ProfileModel {
     email: string,
     phoneNumber: string
   ): Promise<IProfile> {
-    const updateProfileInfoQuery: string =
-      "UPDATE clients SET name = ?, email = ?, phone_number = ? WHERE id = ?";
+    const findUserByPhoneNumberQuery =
+      "SELECT * FROM clients WHERE phone_number = ?";
     try {
-      const [result] = await db.query<ResultSetHeader>(updateProfileInfoQuery, [
+      const [result] = await db.execute<RowDataPacket[]>(
+        findUserByPhoneNumberQuery,
+        [phoneNumber]
+      );
+      if (result[0]?.id !== userId && result.length > 0) {
+        throw new Error("Пользователь с таким номером уже существует");
+      }
+    } catch (error) {
+      console.log(error);
+
+      throw error;
+    }
+
+    const findUserByEmailQuery = "SELECT * FROM clients WHERE email = ?";
+    try {
+      const [result] = await db.execute<RowDataPacket[]>(findUserByEmailQuery, [
+        email,
+      ]);
+      if (result[0]?.id !== userId && result.length > 0) {
+        throw new Error("Пользователь с таким email уже существует");
+      }
+    } catch (error) {
+      console.log(error);
+
+      throw error;
+    }
+
+    const updateProfileInfoQuery =
+      "UPDATE clients SET name = ?, email = ?, phone_number = ? WHERE id = ?";
+
+    try {
+      await db.execute<ResultSetHeader>(updateProfileInfoQuery, [
         name,
         email,
         phoneNumber,
@@ -77,10 +109,8 @@ class ProfileModel {
         phoneNumber: phoneNumber,
       };
       return profile;
-    } catch {
-      throw new Error(
-        "Error occurred while fetching updating profile by id from the database"
-      );
+    } catch (error) {
+      throw error;
     }
   }
 }

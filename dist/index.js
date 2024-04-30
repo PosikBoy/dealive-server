@@ -13,7 +13,7 @@ const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
 const app = (0, express_1.default)();
 const PORT = process.env.port || 5000;
 const corsOptions = {
-    origin: "http://www.localhost:3000",
+    origin: /^(https?:\/\/)?(www\.)?localhost:3000(\/.*)?$/,
     credentials: true, //access-control-allow-credentials:true
     optionSuccessStatus: 200,
 };

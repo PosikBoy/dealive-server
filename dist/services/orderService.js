@@ -33,6 +33,7 @@ class OrderService {
     sendOrder() {
         return __awaiter(this, arguments, void 0, function* (userId = 0, orderData, addresses) {
             try {
+                console.log(userId, orderData, addresses);
                 const orderId = yield order_model_1.default.sendOrder(userId, orderData, addresses);
                 return orderId;
             }

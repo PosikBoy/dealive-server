@@ -30,14 +30,19 @@ class ProfileService {
     email: string,
     phoneNumber: string
   ) {
+    //There is no need to validate accessToken because it is already done in middleware
     const userData = tokenService.validateAccessToken(accessToken);
-    const profile = await profileModel.updateProfileInfo(
-      userData.userId,
-      name,
-      email,
-      phoneNumber
-    );
-    return profile;
+    try {
+      const profile = await profileModel.updateProfileInfo(
+        userData.userId,
+        name,
+        email,
+        phoneNumber
+      );
+      return profile;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

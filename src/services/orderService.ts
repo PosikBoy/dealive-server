@@ -20,6 +20,7 @@ class OrderService {
     addresses: IAddress[]
   ) {
     try {
+      console.log(userId, orderData, addresses);
       const orderId = await orderModel.sendOrder(userId, orderData, addresses);
       return orderId;
     } catch (error) {}

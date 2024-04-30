@@ -3,11 +3,11 @@ import tokenService from "../services/tokenService";
 
 class AuthMiddleware {
   authCheck(req: Request, res: Response, next: NextFunction) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
+    const bearerHeader = req.headers.authorization;
+    if (!bearerHeader) {
       return res.status(401).json({ message: "Auth required" });
     }
-    const accessToken = authHeader.split(" ")[1];
+    const accessToken = bearerHeader.split(" ")[1];
     if (!accessToken) {
       return res.status(401).json({ message: "Auth required" });
     }

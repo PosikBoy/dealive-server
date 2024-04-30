@@ -33,7 +33,6 @@ class ProfileController {
     updateProfileInfo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, email, phoneNumber } = req.body;
-            console.log(name, email, phoneNumber);
             const bearerHeader = req.headers.authorization;
             if (!bearerHeader) {
                 return res.status(401).json({ message: "Auth required" });
@@ -44,7 +43,8 @@ class ProfileController {
                 return res.status(201).json(Object.assign({}, profile));
             }
             catch (error) {
-                res.status(400).json({ message: "Error occured" });
+                console.log(error);
+                res.status(400).json({ message: error.message });
             }
         });
     }

@@ -10,6 +10,10 @@ router.get(
   profileController.getProfileInfo
 );
 
-router.put("/api/profile", profileController.updateProfileInfo);
+router.put(
+  "/api/profile",
+  authMiddleware.authCheck,
+  profileController.updateProfileInfo
+);
 
 export default router;

@@ -44,10 +44,10 @@ export interface IAddressDB {
 
 export interface IOrderDataClient {
   clientId?: number;
-  phone: string;
+  phone?: string;
   phoneName?: string;
-  parcelType?: string;
-  weight?: string;
-  info: string;
+  parcelType: string;
+  weight: string;
+  info?: string;
   price: number;
 }

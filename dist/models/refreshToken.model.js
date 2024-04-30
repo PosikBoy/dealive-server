@@ -71,14 +71,12 @@ class TokenModel {
     removeRefreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(refreshToken);
                 const removeRefreshTokenQuery = "DELETE FROM refresh_tokens WHERE refresh_token = ?";
                 yield db_1.default.execute(removeRefreshTokenQuery, [refreshToken]);
                 return refreshToken;
             }
             catch (error) {
                 console.log(error);
-                throw new Error("Error occurred while removing the refresh token");
             }
         });
     }

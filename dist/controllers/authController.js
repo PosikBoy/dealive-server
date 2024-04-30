@@ -93,10 +93,8 @@ class AuthController {
     }
     logOut(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.cookies);
             try {
                 const refreshToken = req.cookies.refreshToken;
-                console.log(refreshToken);
                 authService_1.default.logOut(refreshToken);
                 res.clearCookie("refreshToken");
                 return res.status(200).json({ message: "logout was successfull" });

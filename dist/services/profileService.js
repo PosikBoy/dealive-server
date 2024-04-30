@@ -45,9 +45,15 @@ class ProfileService {
     }
     updateProfileInfo(accessToken, name, email, phoneNumber) {
         return __awaiter(this, void 0, void 0, function* () {
+            //There is no need to validate accessToken because it is already done in middleware
             const userData = tokenService_1.default.validateAccessToken(accessToken);
-            const profile = yield profile_model_1.default.updateProfileInfo(userData.userId, name, email, phoneNumber);
-            return profile;
+            try {
+                const profile = yield profile_model_1.default.updateProfileInfo(userData.userId, name, email, phoneNumber);
+                return profile;
+            }
+            catch (error) {
+                throw error;
+            }
         });
     }
 }
