@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-// Загружаем переменные окружения из файла .env
-dotenv.config();
+import "dotenv/config";
 
 import { ITokens } from "../types/token.interface";
+
+console.log(process.env);
 
 import tokenModel from "../models/refreshToken.model";
 
