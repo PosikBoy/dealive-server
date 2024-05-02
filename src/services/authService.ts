@@ -45,10 +45,10 @@ class AuthService {
     if (!tokenFromDB) {
       throw new Error("no jwt in db");
     }
-
+ 
     const user = await profileService.getProfileById(userData.userId);
     const tokens = tokenService.generateTokens(userData.userId);
-
+ 
     await tokenService.saveRefreshToken(refreshToken, tokens.refreshToken);
     return {
       ...tokens,

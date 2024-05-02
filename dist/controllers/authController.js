@@ -30,7 +30,6 @@ class AuthController {
                         .json({ message: "Пользователь с такой почтой уже существует" });
                 }
                 const tokens = tokenService_1.default.generateTokens(user.id);
-                const today = new Date();
                 res.cookie("refreshToken", tokens.refreshToken, {
                     httpOnly: true,
                     maxAge: 1000 * 60 * 60 * 24 * 30,
