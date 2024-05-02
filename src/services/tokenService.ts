@@ -3,14 +3,11 @@ import "dotenv/config";
 
 import { ITokens } from "../types/token.interface";
 
-console.log(process.env);
-
 import tokenModel from "../models/refreshToken.model";
 
 interface JwtPayload {
   userId: number;
 }
-console.log(process.env);
 class TokenService {
   generateTokens(userId: number): ITokens {
     const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET!, {

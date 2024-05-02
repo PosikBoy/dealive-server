@@ -8,10 +8,10 @@ import profileRoute from "./routes/profileRoute";
 import orderRoute from "./routes/orderRoute";
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-  origin:"https://dealive.ru" ,
+  origin: "http://localhost:3000",
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };

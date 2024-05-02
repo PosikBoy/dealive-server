@@ -50,6 +50,42 @@ class OrderModel {
       throw new Error("Error occurred while fetching orders from the database");
     }
   }
+  async getOrder(orderId: number) {
+    const getOrderDataQuery = "SELECT * FROM orders_data WHERE id = ?";
+    let orderData;
+    try {
+      const [orderDataRows] = await db.execute<RowDataPacket[]>(
+        getOrderDataQuery,
+        [orderId]
+      );
+      orderData = new OrderDataDTO(orderDataRows[0] as IOrderDataDB);
+    } catch (error) {
+      throw error;
+    }
+
+    const getAddressesQuery =
+      "SELECT * FROM order_addresses WHERE order_id = ?";
+    let orderAddresses;
+    try {
+      const [orderAdressesRows] = await db.execute<RowDataPacket[]>(
+        getAddressesQuery,
+        [orderId]
+      );
+      orderAddresses = orderAdressesRows;
+    } catch (error) {
+      throw error;
+    }
+
+    const addresses = orderAddresses.map((address: RowDataPacket) => {
+      const addressDTO = new AddressDTO(address as IAddressDB);
+      return { ...addressDTO };
+    });
+    const order = {
+      ...orderData,
+      addresses,
+    };
+    return order;
+  }
   async sendOrder(
     userId: number,
     orderData: IOrderDataClient,

@@ -3,9 +3,9 @@ require("dotenv").config();
 
 const access: PoolOptions = {
   host: "localhost",
-  user: "admin",
-  database: "dealive",
-  password: 'BeHcUk05042005!',
+  user: process.env.DB_USER,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
   connectionLimit: 10, // Количество одновременных соединений в пуле
 };
 

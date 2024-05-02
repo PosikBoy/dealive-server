@@ -44,6 +44,34 @@ class OrderModel {
             }
         });
     }
+    getOrder(orderId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const getOrderDataQuery = "SELECT * FROM orders_data WHERE id = ?";
+            let orderData;
+            try {
+                const [orderDataRows] = yield db_1.default.execute(getOrderDataQuery, [orderId]);
+                orderData = new order_dto_1.OrderDataDTO(orderDataRows[0]);
+            }
+            catch (error) {
+                throw error;
+            }
+            const getAddressesQuery = "SELECT * FROM order_addresses WHERE order_id = ?";
+            let orderAddresses;
+            try {
+                const [orderAdressesRows] = yield db_1.default.execute(getAddressesQuery, [orderId]);
+                orderAddresses = orderAdressesRows;
+            }
+            catch (error) {
+                throw error;
+            }
+            const addresses = orderAddresses.map((address) => {
+                const addressDTO = new address_dto_1.AddressDTO(address);
+                return Object.assign({}, addressDTO);
+            });
+            const order = Object.assign(Object.assign({}, orderData), { addresses });
+            return order;
+        });
+    }
     sendOrder(userId, orderData, addresses) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

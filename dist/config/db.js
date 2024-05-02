@@ -7,9 +7,9 @@ const mysql2_1 = __importDefault(require("mysql2"));
 require("dotenv").config();
 const access = {
     host: "localhost",
-    user: "admin",
-    database: "dealive",
-    password: 'BeHcUk05042005!',
+    user: process.env.DB_USER,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
     connectionLimit: 10, // Количество одновременных соединений в пуле
 };
 const pool = mysql2_1.default.createPool(access);
