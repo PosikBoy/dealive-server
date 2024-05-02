@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "tsc",
-    "server": "nodemon dist/index.js",
+    "server": "node dist/index.js",
     "debug": "nodemon --inspect dist/index.js"
   },
   "keywords": [],

@@ -13,7 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-require("dotenv/config");
+const dotenv_1 = __importDefault(require("dotenv"));
+// Загружаем переменные окружения из файла .env
+dotenv_1.default.config();
+console.log(process.env);
 const refreshToken_model_1 = __importDefault(require("../models/refreshToken.model"));
 class TokenService {
     generateTokens(userId) {
