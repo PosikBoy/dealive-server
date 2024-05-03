@@ -28,7 +28,7 @@ class OrderService {
         process.env.TELEGRAM_CHAT_ID || "-4267420551",
         `🚚 Новый заказ №${order.id} 🚚
 
-        📆 Дата: ${new Date(order.date).toLocaleString()}
+
         ${order.phone ? "📞 Телефон: " + order.phone : ""}
        ${order.phoneName ? "📝 Имя: " + order.phoneName : ""}
        📦 Тип отправления: ${order.parcelType}

@@ -118,6 +118,7 @@ class OrderModel {
         ]);
       });
       return {
+        id: orderId,
         userId: userId,
         ...orderData,
         addresses: addresses,
