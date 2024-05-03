@@ -62,6 +62,9 @@ class ProfileModel {
     email: string,
     phoneNumber: string
   ): Promise<IProfile> {
+    if (!phoneNumber) {
+      throw Error("Введите номер телефона!");
+    }
     const findUserByPhoneNumberQuery =
       "SELECT * FROM clients WHERE phone_number = ?";
     try {
@@ -77,7 +80,9 @@ class ProfileModel {
 
       throw error;
     }
-
+    if (!email) {
+      throw Error("Введите электронную почту!");
+    }
     const findUserByEmailQuery = "SELECT * FROM clients WHERE email = ?";
     try {
       const [result] = await db.execute<RowDataPacket[]>(findUserByEmailQuery, [

@@ -117,7 +117,11 @@ class OrderModel {
           address.info || null,
         ]);
       });
-      return orderId;
+      return {
+        userId: userId,
+        ...orderData,
+        addresses: addresses,
+      };
     } catch (error) {
       console.log(error);
       throw new Error("Error occurred while sending order to the database");

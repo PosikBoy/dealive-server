@@ -2,9 +2,7 @@ import orderModel from "../models/order.model";
 import { IAddress, IOrderDataClient } from "../types/order.interface";
 import TelegramBot from "node-telegram-bot-api";
 require("dotenv").config();
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN || "", {
-  polling: true,
-});
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN || "");
 class OrderService {
   async getOrders(userId: number) {
     try {
@@ -24,26 +22,24 @@ class OrderService {
     addresses: IAddress[]
   ) {
     try {
-      const orderId = await orderModel.sendOrder(userId, orderData, addresses);
-      const order = await orderModel.getOrder(orderId);
-      console.log("order", order);
+      const order = await orderModel.sendOrder(userId, orderData, addresses);
 
       bot.sendMessage(
         process.env.TELEGRAM_CHAT_ID || "-4267420551",
         `🚚 Новый заказ №${order.id} 🚚
-      
+
         📆 Дата: ${new Date(order.date).toLocaleString()}
         ${order.phone ? "📞 Телефон: " + order.phone : ""}
        ${order.phoneName ? "📝 Имя: " + order.phoneName : ""}
        📦 Тип отправления: ${order.parcelType}
         ⚖️ Вес: ${order.weight}
-      
+
        ℹ️ Дополнительная информация: ${
          order.info ? order.info : "❌ Не указана"
        }
-      
+
       💰 Цена: ${order.price} руб.
-      
+
       🏠 Адреса:
       ${order.addresses
         .map(
@@ -63,7 +59,7 @@ class OrderService {
         .join("")}`,
         { parse_mode: "HTML" }
       );
-      return orderId;
+      return order;
     } catch (error) {}
   }
 }

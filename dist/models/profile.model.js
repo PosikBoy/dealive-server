@@ -62,6 +62,9 @@ class ProfileModel {
     updateProfileInfo(userId, name, email, phoneNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
+            if (!phoneNumber) {
+                throw Error("Введите номер телефона!");
+            }
             const findUserByPhoneNumberQuery = "SELECT * FROM clients WHERE phone_number = ?";
             try {
                 const [result] = yield db_1.default.execute(findUserByPhoneNumberQuery, [phoneNumber]);
@@ -72,6 +75,9 @@ class ProfileModel {
             catch (error) {
                 console.log(error);
                 throw error;
+            }
+            if (!email) {
+                throw Error("Введите электронную почту!");
             }
             const findUserByEmailQuery = "SELECT * FROM clients WHERE email = ?";
             try {
