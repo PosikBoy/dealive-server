@@ -1,7 +1,8 @@
 # Папка dist
-dist/
+/.vs-code/
+/dist
 
 # Папка node_modules
-node_modules/
+/node_modules/
 
 .env
