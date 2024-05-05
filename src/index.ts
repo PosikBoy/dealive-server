@@ -6,6 +6,7 @@ import cors from "cors";
 import authRoute from "./routes/authRoute";
 import profileRoute from "./routes/profileRoute";
 import orderRoute from "./routes/orderRoute";
+import suggestionRoute from "./routes/suggestionsRoute";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use(authRoute);
 app.use(profileRoute);
 app.use(orderRoute);
+app.use(suggestionRoute);
 
 app.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
