@@ -50,6 +50,8 @@ class TokenModel {
       ]);
       return result;
     } catch (error) {
+      console.log(error);
+
       throw new Error("Error occurred while saving token to db");
     }
   }

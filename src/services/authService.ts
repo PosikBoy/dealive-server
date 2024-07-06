@@ -10,13 +10,16 @@ class AuthService {
     email: string,
     password: string
   ): Promise<IProfile | null> {
+    console.log(email, password);
     const candidate: any = await profileModel.getProfileByEmail(email);
+    console.log(candidate);
     if (candidate) {
       return null;
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = await authModel.createClient(email, hashedPassword);
+    const userId = await authModel.createUser(email, hashedPassword);
     const user = await profileModel.getProfileById(userId);
+    console.log(user);
     return user;
   }
   async login(email: string, password: string): Promise<IProfile | null> {
@@ -45,10 +48,10 @@ class AuthService {
     if (!tokenFromDB) {
       throw new Error("no jwt in db");
     }
- 
+
     const user = await profileService.getProfileById(userData.userId);
     const tokens = tokenService.generateTokens(userData.userId);
- 
+
     await tokenService.saveRefreshToken(refreshToken, tokens.refreshToken);
     return {
       ...tokens,

@@ -1,34 +1,38 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
 import { AddressDTO } from "../dtos/address.dto";
-import { OrderDataDTO } from "../dtos/order.dto";
+import { OrderInfoDTO } from "../dtos/order.dto";
 import {
-  IAddress,
   IAddressDB,
-  IOrderData,
-  IOrderDataClient,
-  IOrderDataDB,
+  IOrderResponse,
+  IOrderInfoDB,
+  IOrderInfoRequest,
+  IAddressRequest,
 } from "../types/order.interface";
-
 class OrderModel {
-  async getOrders(userId: number): Promise<IOrderData[]> {
+  async getOrdersByUserId(userId: number): Promise<IOrderResponse[]> {
+    const getOrderInfoByIdQuery = "SELECT * FROM orders_data WHERE user_id= ?";
+    const getAddressesByOrderIdQuery =
+      "SELECT * FROM order_addresses WHERE order_id = ?";
+    let ordersInfo = [];
+    let orders = [];
     try {
-      const getOrdersIdQuery = "SELECT id FROM orders_data WHERE client_id = ?";
-      const [ordersId] = await db.execute<RowDataPacket[]>(getOrdersIdQuery, [
-        userId,
-      ]);
-
-      const orderPromises = ordersId.map(async ({ id }: RowDataPacket) => {
-        const getOrderByIdQuery = "SELECT * FROM orders_data WHERE id= ?";
-        const [orderDataRows] = await db.execute<RowDataPacket[]>(
-          getOrderByIdQuery,
-          [id]
-        );
-        const orderData = new OrderDataDTO(orderDataRows[0] as IOrderDataDB);
-        const getAddressesQuery =
-          "SELECT * FROM order_addresses WHERE order_id = ?";
+      const [orderInfoRows] = await db.execute<RowDataPacket[]>(
+        getOrderInfoByIdQuery,
+        [userId]
+      );
+      ordersInfo = orderInfoRows.map((orderInfo: RowDataPacket) => {
+        const orderInfoDTO = new OrderInfoDTO(orderInfo as IOrderInfoDB);
+        return { ...orderInfoDTO };
+      });
+    } catch (error) {
+      throw new Error("No orders found");
+    }
+    try {
+      orders = ordersInfo.map(async (orderInfo) => {
+        const id = orderInfo.id;
         const [addressesData] = await db.execute<RowDataPacket[]>(
-          getAddressesQuery,
+          getAddressesByOrderIdQuery,
           [id]
         );
 
@@ -36,42 +40,42 @@ class OrderModel {
           const addressDTO = new AddressDTO(address as IAddressDB);
           return { ...addressDTO };
         });
-
         const order = {
-          ...orderData,
-          addresses,
+          info: {
+            ...orderInfo,
+          },
+          addresses: addresses,
         };
         return order;
       });
-
-      const orders = await Promise.all(orderPromises);
-      return orders;
-    } catch {
-      throw new Error("Error occurred while fetching orders from the database");
+      return Promise.all(orders);
+    } catch (error) {
+      throw new Error("No addresses found");
     }
   }
-  async getOrder(orderId: number) {
-    const getOrderDataQuery = "SELECT * FROM orders_data WHERE id = ?";
-    let orderData;
-    try {
-      const [orderDataRows] = await db.execute<RowDataPacket[]>(
-        getOrderDataQuery,
-        [orderId]
-      );
-      orderData = new OrderDataDTO(orderDataRows[0] as IOrderDataDB);
-    } catch (error) {
-      throw error;
-    }
-
+  async getOrderById(orderId: number): Promise<IOrderResponse | null> {
+    const getOrderInfoQuery = "SELECT * FROM orders_data WHERE id = ?";
     const getAddressesQuery =
       "SELECT * FROM order_addresses WHERE order_id = ?";
     let orderAddresses;
+    let orderInfo;
     try {
-      const [orderAdressesRows] = await db.execute<RowDataPacket[]>(
+      const [orderDataRows] = await db.execute<RowDataPacket[]>(
+        getOrderInfoQuery,
+        [orderId]
+      );
+      console.log(orderDataRows);
+      orderInfo = new OrderInfoDTO(orderDataRows[0] as IOrderInfoDB);
+    } catch (error) {
+      throw new Error("No order found");
+    }
+
+    try {
+      const [orderAddressesRows] = await db.execute<RowDataPacket[]>(
         getAddressesQuery,
         [orderId]
       );
-      orderAddresses = orderAdressesRows;
+      orderAddresses = orderAddressesRows;
     } catch (error) {
       throw error;
     }
@@ -81,33 +85,33 @@ class OrderModel {
       return { ...addressDTO };
     });
     const order = {
-      ...orderData,
+      info: {
+        ...orderInfo,
+      },
       addresses,
     };
     return order;
   }
-  async sendOrder(
-    userId: number,
-    orderData: IOrderDataClient,
-    addresses: IAddress[]
-  ) {
+  async sendOrder(orderInfo: IOrderInfoRequest, addresses: IAddressRequest[]) {
+    const addOrderDataQuery =
+      "INSERT INTO orders_data (user_id, phone, phone_name, parcel_type, weight, price) VALUES (?, ?, ?, ?, ?, ?)";
+
     try {
-      const addOrderDataQuery =
-        "INSERT INTO orders_data (client_id, phone, phone_name, parcel_type, weight, info, price) VALUES (?, ?, ?, ?, ?, ?, ?)";
       const [result] = await db.execute<ResultSetHeader>(addOrderDataQuery, [
-        userId,
-        orderData.phone || null,
-        orderData.phoneName || null,
-        orderData.parcelType,
-        orderData.weight,
-        orderData.info || null,
-        orderData.price,
+        orderInfo.userId || 1,
+        orderInfo.phone || null,
+        orderInfo.phoneName || null,
+        orderInfo.parcelType,
+        orderInfo.weight || null,
+        orderInfo.price,
       ]);
+
       const orderId = result.insertId;
+
       addresses.forEach(async (address) => {
         const addAddressQuery =
           "INSERT INTO order_addresses (order_id, address, floor, apartment, phone, phone_name, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        const [result] = await db.execute(addAddressQuery, [
+        await db.execute(addAddressQuery, [
           orderId,
           address.address || null,
           address.floor || null,
@@ -117,12 +121,16 @@ class OrderModel {
           address.info || null,
         ]);
       });
-      return {
-        id: orderId,
-        userId: userId,
-        ...orderData,
+      const order = {
+        info: {
+          id: orderId,
+          status: "В обработке",
+          date: new Date(),
+          ...orderInfo,
+        },
         addresses: addresses,
       };
+      return order;
     } catch (error) {
       console.log(error);
       throw new Error("Error occurred while sending order to the database");

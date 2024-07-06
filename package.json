@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc",
-    "server": "node dist/index.js",
-    "debug": "nodemon --inspect dist/index.js",
-    "dev": "nodemon dist/index.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "watch": "tsc -w",
+    "dev": "nodemon  dist/index.js"
   },
   "keywords": [],
   "author": "",

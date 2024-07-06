@@ -2,13 +2,12 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../config/db";
 
 import { IProfile } from "../types/profile.interface";
-import { error } from "console";
 
 class ProfileModel {
   async getProfileById(userId: number): Promise<IProfile> {
     try {
       const getProfileByIdQuery =
-        "SELECT id, name, email, phone_number FROM clients WHERE id = ?";
+        "SELECT id, name, email, phone_number FROM users WHERE id = ?";
       const [result] = await db.execute<RowDataPacket[]>(getProfileByIdQuery, [
         userId,
       ]);
@@ -33,7 +32,7 @@ class ProfileModel {
 
   async getProfileByEmail(email: string): Promise<IProfile | null> {
     const getProfileByEmailQuery =
-      "SELECT id, name, email, phone_number FROM clients WHERE email = ?";
+      "SELECT id, name, email, phone_number FROM users WHERE email = ?";
     try {
       const [result] = await db.execute<RowDataPacket[]>(
         getProfileByEmailQuery,
@@ -66,7 +65,7 @@ class ProfileModel {
       throw Error("Введите номер телефона!");
     }
     const findUserByPhoneNumberQuery =
-      "SELECT * FROM clients WHERE phone_number = ?";
+      "SELECT * FROM users WHERE phone_number = ?";
     try {
       const [result] = await db.execute<RowDataPacket[]>(
         findUserByPhoneNumberQuery,
@@ -83,7 +82,7 @@ class ProfileModel {
     if (!email) {
       throw Error("Введите электронную почту!");
     }
-    const findUserByEmailQuery = "SELECT * FROM clients WHERE email = ?";
+    const findUserByEmailQuery = "SELECT * FROM users WHERE email = ?";
     try {
       const [result] = await db.execute<RowDataPacket[]>(findUserByEmailQuery, [
         email,
@@ -98,7 +97,7 @@ class ProfileModel {
     }
 
     const updateProfileInfoQuery =
-      "UPDATE clients SET name = ?, email = ?, phone_number = ? WHERE id = ?";
+      "UPDATE users SET name = ?, email = ?, phone_number = ? WHERE id = ?";
 
     try {
       await db.execute<ResultSetHeader>(updateProfileInfoQuery, [
@@ -115,6 +114,8 @@ class ProfileModel {
       };
       return profile;
     } catch (error) {
+      console.log(error);
+
       throw error;
     }
   }
