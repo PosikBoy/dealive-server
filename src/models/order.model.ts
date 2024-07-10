@@ -11,9 +11,10 @@ import {
 } from "../types/order.interface";
 class OrderModel {
   async getOrdersByUserId(userId: number): Promise<IOrderResponse[]> {
-    const getOrderInfoByIdQuery = "SELECT * FROM orders_data WHERE user_id= ?";
+    const getOrderInfoByIdQuery =
+      "SELECT * FROM orders_data WHERE user_id= ? ORDER BY id desc";
     const getAddressesByOrderIdQuery =
-      "SELECT * FROM order_addresses WHERE order_id = ?";
+      "SELECT * FROM order_addresses WHERE order_id = ? ";
     let ordersInfo = [];
     let orders = [];
     try {
@@ -21,6 +22,7 @@ class OrderModel {
         getOrderInfoByIdQuery,
         [userId]
       );
+
       ordersInfo = orderInfoRows.map((orderInfo: RowDataPacket) => {
         const orderInfoDTO = new OrderInfoDTO(orderInfo as IOrderInfoDB);
         return { ...orderInfoDTO };
@@ -95,6 +97,9 @@ class OrderModel {
   async sendOrder(orderInfo: IOrderInfoRequest, addresses: IAddressRequest[]) {
     const addOrderDataQuery =
       "INSERT INTO orders_data (user_id, phone, phone_name, parcel_type, weight, price) VALUES (?, ?, ?, ?, ?, ?)";
+    const addAddressQuery =
+      "INSERT INTO order_addresses (order_id, address, floor, apartment, phone, phone_name, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    let orderId: number;
 
     try {
       const [result] = await db.execute<ResultSetHeader>(addOrderDataQuery, [
@@ -106,11 +111,12 @@ class OrderModel {
         orderInfo.price,
       ]);
 
-      const orderId = result.insertId;
-
+      orderId = result.insertId;
+    } catch (error) {
+      throw new Error("Error occurred while sending order to the database");
+    }
+    try {
       addresses.forEach(async (address) => {
-        const addAddressQuery =
-          "INSERT INTO order_addresses (order_id, address, floor, apartment, phone, phone_name, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
         await db.execute(addAddressQuery, [
           orderId,
           address.address || null,

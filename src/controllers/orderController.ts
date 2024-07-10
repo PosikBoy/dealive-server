@@ -44,7 +44,6 @@ class OrderController {
       const order = await orderService.sendOrder(info, addresses);
       res.status(200).json(order);
     } catch (error: any) {
-      console.log(error);
       res.status(400).json({ message: error.message });
     }
   }

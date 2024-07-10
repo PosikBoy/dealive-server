@@ -6,31 +6,26 @@ import profileService from "./profileService";
 import { IProfile } from "../types/profile.interface";
 
 class AuthService {
-  async registerUser(
-    email: string,
-    password: string
-  ): Promise<IProfile | null> {
-    console.log(email, password);
+  async registerUser(email: string, password: string): Promise<IProfile> {
     const candidate: any = await profileModel.getProfileByEmail(email);
-    console.log(candidate);
     if (candidate) {
-      return null;
+      throw new Error("Пользователь с такой почтой уже существует");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const userId = await authModel.createUser(email, hashedPassword);
     const user = await profileModel.getProfileById(userId);
-    console.log(user);
     return user;
   }
-  async login(email: string, password: string): Promise<IProfile | null> {
+  async login(email: string, password: string): Promise<IProfile> {
     const user = await profileModel.getProfileByEmail(email);
     if (!user) {
-      return null;
+      throw new Error("Почта или пароль неправильные");
     }
     const hashedPassword = await authModel.getHashedPassword(email);
     const isPasswordValid = await bcrypt.compare(password, hashedPassword);
+    console.log("isPasswordValid", isPasswordValid);
     if (!isPasswordValid) {
-      return null;
+      throw new Error("Почта или пароль неправильные");
     }
     return user;
   }
@@ -44,23 +39,12 @@ class AuthService {
       throw new Error("jwt expired");
     }
 
-    const tokenFromDB = await tokenService.getRefreshToken(refreshToken);
-    if (!tokenFromDB) {
-      throw new Error("no jwt in db");
-    }
-
     const user = await profileService.getProfileById(userData.userId);
     const tokens = tokenService.generateTokens(userData.userId);
-
-    await tokenService.saveRefreshToken(refreshToken, tokens.refreshToken);
     return {
       ...tokens,
       user,
     };
-  }
-  async logOut(refreshToken: string) {
-    const token = await tokenService.removeRefreshToken(refreshToken);
-    return token;
   }
 }
 

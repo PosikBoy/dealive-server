@@ -12,11 +12,6 @@ class AuthController {
     }
     try {
       const user = await authService.registerUser(email, password);
-      if (!user) {
-        return res
-          .status(400)
-          .json({ message: "Пользователь с такой почтой уже существует" });
-      }
       const tokens = tokenService.generateTokens(user.id);
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
@@ -27,7 +22,7 @@ class AuthController {
         accessToken: tokens.accessToken,
       });
     } catch (error: any) {
-      return res.status(500).json({ message: error });
+      return res.status(404).json({ message: error.message });
     }
   }
   async login(req: Request, res: Response) {
@@ -38,11 +33,6 @@ class AuthController {
     }
     try {
       const user = await authService.login(email, password);
-      if (!user) {
-        return res
-          .status(401)
-          .json({ message: "Логин или пароль неправильные" });
-      }
       const tokens = tokenService.generateTokens(user.id);
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
@@ -54,7 +44,7 @@ class AuthController {
         accessToken: tokens.accessToken,
       });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      return res.status(404).json({ message: error.message });
     }
   }
   async refresh(req: Request, res: Response) {
@@ -63,6 +53,7 @@ class AuthController {
       const userData = await authService.refresh(refreshToken);
       res.cookie("refreshToken", userData.refreshToken, {
         httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 30,
       });
 
       return res.status(201).json({
@@ -75,17 +66,13 @@ class AuthController {
   }
   async logOut(req: Request, res: Response) {
     try {
-      const refreshToken = req.cookies.refreshToken;
-      authService.logOut(refreshToken);
       res.clearCookie("refreshToken");
-      return res.status(200).json({ message: "logout was successfull" });
+      return res.status(200).json({ message: "logout was successful" });
     } catch (error) {
       return res.status(500).json({ message: error });
     }
   }
 }
-
-// Аутентификация пользователя
 
 const authController = new AuthController();
 export default authController;

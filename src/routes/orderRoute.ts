@@ -6,5 +6,9 @@ const router = express.Router();
 
 router.get("/api/orders", authMiddleware.authCheck, ordersController.getOrders);
 router.post("/api/order", ordersController.sendOrder);
-router.get("/api/order/:id", ordersController.getOrderById);
+router.get(
+  "/api/order/:id",
+  authMiddleware.authCheck,
+  ordersController.getOrderById
+);
 export default router;
